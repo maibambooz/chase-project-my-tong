@@ -3,15 +3,27 @@ package com.jpmc.theater;
 public class Reservation {
     private Customer customer;
     private Showing showing;
-    private int audienceCount;
+    private int quantity;
 
-    public Reservation(Customer customer, Showing showing, int audienceCount) {
+    public Reservation(Customer customer, Showing showing, int quantity){
         this.customer = customer;
         this.showing = showing;
-        this.audienceCount = audienceCount;
+        this.quantity = quantity;
     }
 
-    public double totalFee() {
-        return showing.getMovieFee() * audienceCount;
+    public Customer getCustomer(){
+        return customer;
+    }
+
+    public Showing getShowing(){
+        return showing;
+    }
+
+    public int getQuantity(){
+        return quantity;
+    }
+
+    public double totalFee(){
+        return showing.getMovieFee() * getQuantity();
     }
 }

@@ -1,7 +1,6 @@
 package com.jpmc.theater;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
@@ -11,22 +10,22 @@ public class Movie {
     private double ticketPrice;
     private boolean specialCode;
 
-    public Movie(String title, Duration runningTime, double ticketPrice, boolean specialCode) {
+    public Movie(String title, Duration runningTime, double ticketPrice, boolean specialCode){
         this.title = title;
         this.runningTime = runningTime;
         this.ticketPrice = ticketPrice;
         this.specialCode = specialCode;
     }
 
-    public String getTitle() {
+    public String getTitle(){
         return title;
     }
 
-    public Duration getRunningTime() {
+    public Duration getRunningTime(){
         return runningTime;
     }
 
-    public double getTicketPrice() {
+    public double getTicketPrice(){
         return ticketPrice;
     }
 
@@ -44,7 +43,7 @@ public class Movie {
         return value1 > value2 ? value1 : value2;
     }
 
-    private double getDiscount(Showing showing) {
+    private double getDiscount(Showing showing){
         double specialDiscount = 0;
         double tempDiscount = 0;
         double sequenceDiscount = 0;
@@ -72,8 +71,6 @@ public class Movie {
             sequenceDiscount = DISCOUNTS.SHOWING_FIRST.amount;
         } else if (showSequence == 2) {
             sequenceDiscount = DISCOUNTS.SHOWING_SECOND.amount;
-        } else {
-            throw new IllegalArgumentException("Showing sequence does not have applicable discount");
         }
 
         // biggest discount wins
@@ -81,9 +78,13 @@ public class Movie {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object o){
+        if (this == o){
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()){
+            return false;
+        }
         Movie movie = (Movie) o;
         return Double.compare(movie.ticketPrice, ticketPrice) == 0
                 && Objects.equals(title, movie.title)

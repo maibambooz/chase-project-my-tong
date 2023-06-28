@@ -1,36 +1,45 @@
 package com.jpmc.theater;
 
+import java.util.UUID;
 import java.util.Objects;
 
 public class Customer {
 
     private String name;
-    private String id;
+    private UUID userId;
 
     /**
      * @param name customer name
-     * @param id customer id
+     * @param userId customer id
      */
-    public Customer(String name, String id) {
-        this.id = id; // NOTE - id is not used anywhere at the moment
+    public Customer(String name, UUID userId) {
+        this.userId = userId;
         this.name = name;
     }
 
+    public String getName(){
+        return name;
+    }
+
+    public UUID getUserId(){
+        return userId;
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Customer)) return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(name, customer.name) && Objects.equals(id, customer.id);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Customer)) return false;
+        Customer customer = (Customer) object;
+        return Objects.equals(name, customer.name) && Objects.equals(userId, customer.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id);
+        return Objects.hash(name, userId);
     }
 
     @Override
     public String toString() {
-        return "name: " + name;
+        return "Customer Id: " + getUserId() + ", Customer name: " + getName();
     }
 }
