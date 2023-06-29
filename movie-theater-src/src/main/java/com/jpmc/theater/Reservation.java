@@ -1,5 +1,7 @@
 package com.jpmc.theater;
 
+import java.util.Objects;
+
 public class Reservation {
     private Customer customer;
     private Showing showing;
