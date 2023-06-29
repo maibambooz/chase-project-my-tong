@@ -34,6 +34,7 @@ public class Theater {
 
     /**
      * Generate showing schedule
+     * List of schedule showtimes are generated for three movies
      */
     private void generateSchedule(){
         Movie spiderMan = new Movie("Spider-Man: No Way Home", Duration.ofMinutes(90), 12.5, true);
@@ -61,22 +62,25 @@ public class Theater {
     }
 
     /**
-     * @param customer Customer object with information
-     * @param sequence showing sequence
-     * @param quantity number of tickets requesting
+     * @param customer customer information for identification
+     * @param sequence show number for the day
+     * @param quantity number of tickets requested for showing
      */
     public Reservation reserveShowing(Customer customer, int sequence, int quantity) {
 
         Showing showing = null;
-        try {
-            showing = schedule.get(sequence - 1);
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
-            System.out.println("Unable to find showing with given sequence: " + sequence);
+        for(Showing show : schedule){
+            if(show.getSequenceOfTheDay() != sequence){
+                throw new IllegalArgumentException("Unable to find showing with given sequence: " + sequence);
+            }else{
+                showing = show;
+                break;
+            }
         }
 
+        // This is currently not used, but once a reservation has been made it is added onto a hashmap
         Reservation reservation = new Reservation(customer, showing, quantity);
-        ArrayList<Reservation> temp = showingReservations.get(sequence - 1);
+        ArrayList<Reservation> temp = showingReservations.get(sequence);
         temp.add(reservation);
         showingReservations.put(sequence, temp);
 
@@ -111,9 +115,9 @@ public class Theater {
         System.out.println("===================================================");
         getSchedule().forEach(s -> {
                     System.out.println(s.getSequenceOfTheDay() + ": " + formatLocalDateTime(s.getStartTime()) + " - " + s.getMovie().getTitle() + " " + humanReadableFormat(s.getMovie().getRunningTime()) + ", Price: $" + s.getMovieFee());
-                }
-        );
+        });
         System.out.println("===================================================");
+        printJson();
     }
 
     /**
@@ -156,10 +160,9 @@ public class Theater {
     }
 
     /**
-     * @param obj Showing obj containing movie contents
-     * @return String of Json format
+     * Method simple iterates through schedule showing objects and prints in json format
      */
-    public void printJson() {
+    private void printJson() {
         ObjectMapper mapper = new ObjectMapper();
 
         System.out.println("===================================================");
@@ -184,6 +187,5 @@ public class Theater {
 
     public static void main(String[] args) {
         Theater theater = new Theater(LocalDateProvider.singleton());
-        theater.printSchedule();
-    }
+        theater.printSchedule();    }
 }

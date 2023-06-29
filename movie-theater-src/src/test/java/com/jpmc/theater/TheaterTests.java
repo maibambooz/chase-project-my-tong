@@ -25,19 +25,26 @@ public class TheaterTests {
         assertTrue(testReservation.getCustomer().equals(customer));
         assertTrue(testReservation.getQuantity() == 2);
         assertEquals(2, testReservation.getShowing().getSequenceOfTheDay());
-//        theater.printAllShowingReservations();
+    }
+
+    @Test
+    void noExistingSequence(){
+        Theater theater = new Theater(LocalDateProvider.singleton());
+        Customer customer = new Customer("Jane Doe", UUID.randomUUID());
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            theater.reserveShowing(customer, 10, 1);
+        });
+
+        String expectedMessage = "Unable to find showing with given sequence: " + 10;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
     void printMovieSchedule() {
         Theater theater = new Theater(LocalDateProvider.singleton());
         theater.printSchedule();
-    }
-
-    @Test
-    void printScheduleJsonFormat(){
-        Theater theater = new Theater(LocalDateProvider.singleton());
-        theater.printJson();
     }
 
     @Test
