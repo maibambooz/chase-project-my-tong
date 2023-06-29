@@ -1,18 +1,17 @@
 package com.jpmc.theater;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class Movie {
-    private static int MOVIE_CODE_SPECIAL = 1;
-
     private String title;
-    private String description;
     private Duration runningTime;
     private double ticketPrice;
-    private int specialCode;
+    private boolean specialCode;
 
-    public Movie(String title, Duration runningTime, double ticketPrice, int specialCode) {
+    public Movie(String title, Duration runningTime, double ticketPrice, boolean specialCode) {
         this.title = title;
         this.runningTime = runningTime;
         this.ticketPrice = ticketPrice;
@@ -32,28 +31,53 @@ public class Movie {
     }
 
     public double calculateTicketPrice(Showing showing) {
-        return ticketPrice - getDiscount(showing.getSequenceOfTheDay());
+        return ticketPrice - getDiscount(showing);
     }
 
-    private double getDiscount(int showSequence) {
+    // Helper method that checks if the current time is within slots 11:00am to 4:00pm
+    private boolean isBetweenSlots(LocalTime time, LocalTime start, LocalTime end){
+        return time.compareTo(start) >= 0 && time.compareTo(end) < 0;
+    }
+
+    // Helper method to compare two best prices of discounts using ternary operations
+    private double bestValue(double value1, double value2){
+        return value1 > value2 ? value1 : value2;
+    }
+
+    private double getDiscount(Showing showing) {
         double specialDiscount = 0;
-        if (MOVIE_CODE_SPECIAL == specialCode) {
-            specialDiscount = ticketPrice * 0.2;  // 20% discount for special movie
-        }
-
+        double tempDiscount = 0;
         double sequenceDiscount = 0;
-        if (showSequence == 1) {
-            sequenceDiscount = 3; // $3 discount for 1st show
-        } else if (showSequence == 2) {
 
-            sequenceDiscount = 2; // $2 discount for 2nd show
+        if(specialCode){
+            specialDiscount = getTicketPrice() * DISCOUNTS.SPECIAL.percent_off;
         }
-//        else {
-//            throw new IllegalArgumentException("failed exception");
-//        }
+
+        // Grabbing the local time to check to see if it is between 11am to 4pm to apply discounts
+        LocalTime localTime = showing.getStartTime().toLocalTime();
+        if(isBetweenSlots(localTime, LocalTime.parse("11:00"), LocalTime.parse("16:00"))){
+            tempDiscount = getTicketPrice() * DISCOUNTS.SPECIAL_TIME.percent_off;
+            specialDiscount = bestValue(specialDiscount, tempDiscount);
+        }
+
+        // Handling discount rate for 7th day of the month
+        int currentDayOfMonth = showing.getStartTime().getDayOfMonth();
+        if(currentDayOfMonth == 7){
+            tempDiscount = DISCOUNTS.SEVENTH_DAY.amount;
+            specialDiscount = bestValue(specialDiscount, tempDiscount);
+        }
+
+        int showSequence = showing.getSequenceOfTheDay();
+        if (showSequence == 1) {
+            sequenceDiscount = DISCOUNTS.SHOWING_FIRST.amount;
+        } else if (showSequence == 2) {
+            sequenceDiscount = DISCOUNTS.SHOWING_SECOND.amount;
+        } else {
+            throw new IllegalArgumentException("Showing sequence does not have applicable discount");
+        }
 
         // biggest discount wins
-        return specialDiscount > sequenceDiscount ? specialDiscount : sequenceDiscount;
+        return bestValue(specialDiscount, sequenceDiscount);
     }
 
     @Override
@@ -63,13 +87,12 @@ public class Movie {
         Movie movie = (Movie) o;
         return Double.compare(movie.ticketPrice, ticketPrice) == 0
                 && Objects.equals(title, movie.title)
-                && Objects.equals(description, movie.description)
                 && Objects.equals(runningTime, movie.runningTime)
                 && Objects.equals(specialCode, movie.specialCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, description, runningTime, ticketPrice, specialCode);
+        return Objects.hash(title, runningTime, ticketPrice, specialCode);
     }
 }
