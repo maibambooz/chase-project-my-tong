@@ -17,10 +17,16 @@ public class Customer {
         this.name = name;
     }
 
+    /**
+     * @return Retrieve name of Customer
+     */
     public String getName(){
         return name;
     }
 
+    /**
+     * @return Retrieve unique id of Customer
+     */
     public UUID getUserId(){
         return userId;
     }

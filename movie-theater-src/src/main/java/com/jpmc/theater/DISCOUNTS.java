@@ -1,5 +1,10 @@
 package com.jpmc.theater;
 
+/**
+ * @author My Tong
+ * DISCOUNT enums representing of each unique discount rules by the theater.
+ * Be it a percentage or a fix dollar amount.
+ */
 public enum DISCOUNTS {
     SPECIAL("Special", 0.2, 0),
     SHOWING_FIRST("ShowOne", 0, 3),
