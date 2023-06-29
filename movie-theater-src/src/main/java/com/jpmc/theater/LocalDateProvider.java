@@ -15,7 +15,7 @@ public class LocalDateProvider {
         return instance;
     }
 
-    public LocalDate currentDate() {
-            return LocalDate.now();
+    public LocalDate currentDate(){
+        return LocalDate.now();
     }
 }

@@ -1,8 +1,11 @@
 package com.jpmc.theater;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -11,7 +14,7 @@ public class Theater {
     LocalDateProvider provider;
     private List<Showing> schedule;
 
-    public Theater(LocalDateProvider provider) {
+    public Theater(LocalDateProvider provider){
         this.provider = provider;
 
         Movie spiderMan = new Movie("Spider-Man: No Way Home", Duration.ofMinutes(90), 12.5, true);
@@ -30,7 +33,7 @@ public class Theater {
         );
     }
 
-    public Reservation reserve(Customer customer, int sequence, int howManyTickets) {
+    public Reservation reserveShowing(Customer customer, int sequence, int howManyTickets){
         Showing showing;
         try {
             showing = schedule.get(sequence - 1);
@@ -41,16 +44,26 @@ public class Theater {
         return new Reservation(customer, showing, howManyTickets);
     }
 
-    public void printSchedule() {
-        System.out.println(provider.currentDate());
+    public void printSchedule(){
+        System.out.println("===================================================");
+        System.out.println("Movie schedule for: " + formatLocalDateTime(provider.currentDate()));
         System.out.println("===================================================");
         schedule.forEach(s ->
-                System.out.println(s.getSequenceOfTheDay() + ": " + s.getStartTime() + " " + s.getMovie().getTitle() + " " + humanReadableFormat(s.getMovie().getRunningTime()) + " $" + s.getMovieFee())
+                System.out.println(s.getSequenceOfTheDay() + ": " + formatLocalDateTime(s.getStartTime()) + " - " + s.getMovie().getTitle() + " " + humanReadableFormat(s.getMovie().getRunningTime()) + ", Price: $" + s.getMovieFee())
         );
         System.out.println("===================================================");
     }
 
-    public String humanReadableFormat(Duration duration) {
+    private String formatLocalDateTime(LocalDate date){
+        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL));
+    }
+
+    private String formatLocalDateTime(LocalDateTime date){
+        return date.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"));
+    }
+
+    // There should be no reason for this helper function to be public
+    private String humanReadableFormat(Duration duration){
         long hour = duration.toHours();
         long remainingMin = duration.toMinutes() - TimeUnit.HOURS.toMinutes(duration.toHours());
 
@@ -58,18 +71,16 @@ public class Theater {
     }
 
     // (s) postfix should be added to handle plural correctly
-    private String handlePlural(long value) {
-        if (value == 1) {
+    private String handlePlural(long value){
+        if(value == 1){
             return "";
-        }
-        else {
+        }else{
             return "s";
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
         Theater theater = new Theater(LocalDateProvider.singleton());
         theater.printSchedule();
-        System.out.println("hi");
     }
 }
